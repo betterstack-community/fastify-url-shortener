@@ -16,6 +16,10 @@ export default async function fastifyRoutes(fastify) {
     urlController.shorten
   );
 
+  fastify.get('/health', (req, reply) => {
+    reply.send({ status: 'ok' });
+  });
+
   fastify.get('/:shortID', urlController.redirect);
 
   fastify.setErrorHandler(errorHandler);
