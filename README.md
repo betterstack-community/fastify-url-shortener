@@ -1,7 +1,7 @@
 # URL Shortener
 
 A URL Shortener Application built with Node.js, Fastify and PostgreSQL. See the
-[final branch](https://github.com/finallyayo/node-url-shortener/tree/fastify)
+[final branch](https://github.com/betterstack-community/node-url-shortener/tree/final)
 for the updated code with Docker configuration.
 
 **Tutorial**:
