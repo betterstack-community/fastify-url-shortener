@@ -79,7 +79,7 @@ spec:
     name: "{{ include "chart.fullname" . }}-postgres"
     template:
       data:
-        POSTGRES_PASSWORD: '{{ .password }}'
+        POSTGRES_PASSWORD: "{{ printf "{{ .password }}" }}"
         POSTGRES_USER: postgres
         POSTGRES_DB: app
 {{- end }} 
