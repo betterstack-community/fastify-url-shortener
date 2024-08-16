@@ -1,0 +1,86 @@
+{{- if .Values.postgres.enabled }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "chart.fullname" . }}-postgres
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "chart.name" . }}
+      app.kubernetes.io/instnace: postgres
+  serviceName: {{ include "chart.fullname" }}-postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+      app.kubernetes.io/name: {{ include "chart.name" . }}
+      app.kubernetes.io/instnace: postgres
+    spec:
+      containers:
+      - name: posgres
+        image: postgres:16.4-bullseye
+        envFrom:
+        - secretRef:
+             name: "{{ include "chart.fullname" . }}-postgres"
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres
+          mountPath: /var/lib/postgresql
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres
+    spec:
+      # storageClassName: gp2
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-postgres
+spec:
+  selector:
+    app.kubernetes.io/name: {{ include "chart.name" . }}
+    app.kubernetes.io/instnace: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: Password
+metadata:
+  name: "{{ include "chart.fullname" . }}-postgres"
+spec:
+  length: 42
+  digits: 5
+  symbols: 5
+  symbolCharacters: "-_$@"
+  noUpper: false
+  allowRepeat: true
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: "{{ include "chart.fullname" . }}-postgres"
+spec:
+  dataFrom:
+  - sourceRef:
+      generatorRef:
+        apiVersion: generators.external-secrets.io/v1alpha1
+        kind: Password
+        name: "{{ include "chart.fullname" . }}-postgres"
+  refreshInterval: 0m
+  target:
+    immutable: true
+    name: "{{ include "chart.fullname" . }}-postgres"
+    template:
+      data:
+        POSTGRES_PASSWORD: '{{ .password }}'
+        POSTGRES_USER: postgres
+        POSTGRES_DB: app
+{{- end }} 

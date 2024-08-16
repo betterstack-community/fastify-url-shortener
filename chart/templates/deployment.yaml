@@ -29,6 +29,11 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+        {{- if .Values.postgres.enabled }}
+          envFrom:
+            - secretRef:
+                name: "{{ include "chart.fullname" . }}-postgres"
+        {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
