@@ -30,6 +30,8 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           env:
+          - name: NODE_ENV
+            value: "{{ .Values.nodeEnv }}"
         {{- if .Values.postgres.enabled }}
           envFrom:
             - secretRef:

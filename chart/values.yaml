@@ -4,6 +4,8 @@
 
 replicaCount: 1
 
+nodeEnv: production
+
 image:
   repository: ghcr.io/whereismyjetpack/fastify-url-shortener
   pullPolicy: IfNotPresent
