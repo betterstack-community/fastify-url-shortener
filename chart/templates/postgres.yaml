@@ -9,7 +9,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "chart.name" . }}
       app.kubernetes.io/instnace: postgres
-  serviceName: {{ include "chart.fullname" }}-postgres
   replicas: 1
   template:
     metadata:
