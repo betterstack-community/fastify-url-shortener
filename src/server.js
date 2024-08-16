@@ -26,7 +26,7 @@ try {
 
   logger.info('Connected to database');
 
-  const address = await app.listen({ port: env.port }, '0.0.0.0');
+  const address = await app.listen({ port: env.port });
   logger.info(
     `URL Shortener is running in ${env.node_env} mode → PORT ${address}`
   );
