@@ -80,7 +80,7 @@ spec:
     template:
       data:
         POSTGRES_PASSWORD: "{{ printf "{{ .password }}" }}"
-        POSTGRES_USER: postgres
+        POSTGRES_USER: app
         POSTGRES_DB: app
         POSTGRES_HOST: "{{ include "chart.fullname" . }}-postgres"
 {{- end }} 
