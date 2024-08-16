@@ -82,4 +82,5 @@ spec:
         POSTGRES_PASSWORD: "{{ printf "{{ .password }}" }}"
         POSTGRES_USER: postgres
         POSTGRES_DB: app
+        POSTGRES_HOST: "{{ include "chart.fullname" . }}-postgres"
 {{- end }} 
