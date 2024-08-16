@@ -30,6 +30,8 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           env:
+          - name: PORT
+            value: "{{ .Values.service.port }}"
           - name: NODE_ENV
             value: "{{ .Values.nodeEnv }}"
         {{- if .Values.postgres.enabled }}
