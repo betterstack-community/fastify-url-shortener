@@ -1,0 +1,92 @@
+name: Main
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up docker buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      # - name: Log into registry ${{ env.REGISTRY }}
+      #   uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      #   with:
+      #     registry: ${{ env.REGISTRY }}
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set build arguments
+        id: set-build-args
+        run: |
+          echo "hi"
+          echo "${{ toJson(github.event) }}"
+
+      # - name: Build and push Docker image
+      #   id: build-and-push
+      #   uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.pull_request.head.sha }}"
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+
+      # - name: 'Build Image'
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      #     tags: |
+      #       ${{ steps.login-registry.outputs.registry }}/${{ env.NAMESPACE }}/${{ matrix.app.name }}:latest
+      #       ${{ steps.login-registry.outputs.registry }}/${{ env.NAMESPACE }}/${{ matrix.app.name }}:${{ env.BUILD_SHA }}
+
+  # deploy-integration:
+  #   name: Deploy to Integration
+  #   # Only promote on successful builds and only on the main branch
+  #   if: ${{ !failure() && !cancelled() && github.ref == 'refs/heads/main' && needs.detect-changes.outputs.overlays != '[]'}}
+  #   needs:
+  #     - detect-changes
+  #     - docker-build
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     K8S_DEPLOYMENT_REPO: OpenGov/k8s-deployment-utility-billing
+  #     OVERLAYS: ${{ needs.detect-changes.outputs.overlays }}
+  #   steps:
+  #     - name: Checkout Deployment Repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: ${{ env.K8S_DEPLOYMENT_REPO }}
+  #         token: ${{ secrets.GIT_HUB_ACCESS_TOKEN_DELIVERATOR }}
+  #         path: deployment
+
+  #     - name: Promote to ${{ env.K8S_DEPLOYMENT_REPO }}
+  #       uses: kustomize-everything/action-promote@v4.2.1
+  #       with:
+  #         images: ${{ env.OVERLAYS }}
+  #         target-repo: ${{ env.K8S_DEPLOYMENT_REPO }}
+  #         promotion-method: pull_request
+  #         working-directory: deployment
+  #         github-token: ${{ secrets.GIT_HUB_ACCESS_TOKEN_DELIVERATOR }}
+  #         git-commit-user: 'Deliverator'
+  #         git-commit-email: services-argocd+opengov-deliverator@opengov.com
